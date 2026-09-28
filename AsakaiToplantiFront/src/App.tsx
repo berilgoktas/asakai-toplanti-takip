@@ -240,7 +240,14 @@ export default function App() {
         body: JSON.stringify({ KullaniciAdi: username, Sifre: password }),
       });
       if (!response.ok) {
-        return { ok: false, message: "Kullanıcı adı veya şifre hatalı" };
+        let message = "Kullanıcı adı veya şifre hatalı";
+        try {
+          const data = await response.json();
+          if (data?.message) message = data.message;
+        } catch {
+          /* ignore */
+        }
+        return { ok: false, message };
       }
       const basicToken = btoa(`${username}:${password}`);
       const header = `Basic ${basicToken}`;

@@ -46,6 +46,8 @@ builder.Services.AddAuthentication("Basic")
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
 
 builder.Services.AddAuthorization();
+builder.Services.AddSingleton<LoginLockoutStore>();
+builder.Services.AddSingleton<PerUserRateLimitStore>();
 
 var app = builder.Build();
 
@@ -76,6 +78,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("ViteFrontend");
 app.UseAuthentication();
+app.UseMiddleware<PerUserRateLimitMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 

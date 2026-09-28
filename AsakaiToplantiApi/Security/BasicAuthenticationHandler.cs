@@ -10,15 +10,18 @@ namespace AsakaiToplantiApi.Security;
 public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     private readonly IConfiguration _cfg;
+    private readonly LoginLockoutStore _lockout;
 
     public BasicAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        IConfiguration cfg)
+        IConfiguration cfg,
+        LoginLockoutStore lockout)
         : base(options, logger, encoder)
     {
         _cfg = cfg;
+        _lockout = lockout;
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -49,6 +52,12 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         var kullaniciAdi = split[0];
         var sifre = split[1];
 
+        if (_lockout.IsLocked(kullaniciAdi, out var remaining))
+        {
+            Context.Items["loginLockRemaining"] = remaining;
+            return Task.FromResult(AuthenticateResult.Fail(LockoutText.WaitMessage(remaining)));
+        }
+
         using var c = new NpgsqlConnection(_cfg.GetConnectionString("Default"));
         c.Open();
 
@@ -63,7 +72,14 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
 
         using var rd = cmd.ExecuteReader();
         if (!rd.Read())
+        {
+            var lockFor = _lockout.RegisterFailure(kullaniciAdi);
+            if (lockFor != null)
+                Context.Items["loginLockRemaining"] = lockFor.Value;
             return Task.FromResult(AuthenticateResult.Fail("Kullanici adi veya sifre hatali."));
+        }
+
+        _lockout.Reset(kullaniciAdi);
 
         var kullaniciId = rd.GetInt32(0).ToString();
         var claimName = rd.GetString(1);
@@ -77,5 +93,19 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
         return Task.FromResult(AuthenticateResult.Success(ticket));
+    }
+
+    protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
+    {
+        if (Context.Items["loginLockRemaining"] is TimeSpan remaining)
+        {
+            var seconds = Math.Max(1, (int)Math.Ceiling(remaining.TotalSeconds));
+            Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            Response.Headers.RetryAfter = seconds.ToString();
+            await Response.WriteAsJsonAsync(new { message = LockoutText.WaitMessage(remaining) });
+            return;
+        }
+
+        await base.HandleChallengeAsync(properties);
     }
 }
