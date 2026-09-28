@@ -249,14 +249,16 @@ export default function App() {
       if (!response.ok) {
         let message = "Kullanıcı adı veya şifre hatalı";
         let lockSeconds = 0;
+        let kalanHak: number | undefined;
         try {
           const data = await response.json();
           if (data?.message) message = data.message;
           if (typeof data?.kilitSaniye === "number") lockSeconds = data.kilitSaniye;
+          if (typeof data?.kalanHak === "number") kalanHak = data.kalanHak;
         } catch {
           /* ignore */
         }
-        return { ok: false, message, lockSeconds };
+        return { ok: false, message, lockSeconds, kalanHak };
       }
       const basicToken = btoa(`${username}:${password}`);
       const header = `Basic ${basicToken}`;

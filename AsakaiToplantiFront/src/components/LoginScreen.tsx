@@ -4,8 +4,14 @@ type LoginScreenProps = {
   onLogin: (
     username: string,
     password: string
-  ) => Promise<{ ok: boolean; message?: string; lockSeconds?: number }>;
+  ) => Promise<{ ok: boolean; message?: string; lockSeconds?: number; kalanHak?: number }>;
 };
+
+const STORAGE_KEY = "asakai.loginGuard";
+const LAST_USER_KEY = "asakai.loginGuardLastUser";
+
+type Guard = { kalanHak: number; lockUntil: number | null };
+type GuardMap = Record<string, Guard>;
 
 const formatLock = (totalSeconds: number) => {
   const s = Math.max(0, totalSeconds);
@@ -16,13 +22,71 @@ const formatLock = (totalSeconds: number) => {
   return `${minutes} dakika ${seconds} saniye`;
 };
 
+const userKey = (name: string) => name.trim().toLowerCase();
+
+const readMap = (): GuardMap => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as GuardMap) : {};
+  } catch {
+    return {};
+  }
+};
+
+const writeGuard = (name: string, guard: Guard) => {
+  const key = userKey(name);
+  if (!key) return;
+  const map = readMap();
+  map[key] = guard;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+  localStorage.setItem(LAST_USER_KEY, name.trim());
+};
+
+const clearGuard = (name: string) => {
+  const key = userKey(name);
+  const map = readMap();
+  if (key) delete map[key];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+};
+
+const secondsLeft = (lockUntil: number | null) => {
+  if (!lockUntil) return 0;
+  return Math.max(0, Math.ceil((lockUntil - Date.now()) / 1000));
+};
+
 export default function LoginScreen({ onLogin }: LoginScreenProps) {
-  const [username, setUsername] = useState("");
+  const lastUser = localStorage.getItem(LAST_USER_KEY) ?? "";
+  const [username, setUsername] = useState(lastUser);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [lockLeft, setLockLeft] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const applyGuard = (name: string) => {
+    const stored = readMap()[userKey(name)];
+    if (!stored) {
+      setLockLeft(0);
+      setError("");
+      return;
+    }
+    const left = secondsLeft(stored.lockUntil);
+    if (left > 0) {
+      setLockLeft(left);
+      setError("");
+      return;
+    }
+    setLockLeft(0);
+    if (stored.kalanHak < 10) {
+      setError(`Kullanıcı adı veya şifre hatalı. Kalan deneme hakkı: ${stored.kalanHak}`);
+    } else {
+      setError("");
+    }
+  };
+
+  useEffect(() => {
+    applyGuard(username);
+  }, []);
 
   useEffect(() => {
     if (lockLeft <= 0) return;
@@ -41,18 +105,24 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
       return;
     }
     setLoading(true);
-    const result = await onLogin(username.trim(), password);
+    const name = username.trim();
+    const result = await onLogin(name, password);
     setLoading(false);
     if (result.ok) {
       setLockLeft(0);
+      setError("");
+      clearGuard(name);
       return;
     }
     if (result.lockSeconds && result.lockSeconds > 0) {
+      writeGuard(name, { kalanHak: 0, lockUntil: Date.now() + result.lockSeconds * 1000 });
       setLockLeft(result.lockSeconds);
       setError("");
       return;
     }
-    setError(result.message || "Kullanıcı adı veya şifre hatalı");
+    const kalan = typeof result.kalanHak === "number" ? result.kalanHak : 9;
+    writeGuard(name, { kalanHak: kalan, lockUntil: null });
+    setError(result.message || `Kullanıcı adı veya şifre hatalı. Kalan deneme hakkı: ${kalan}`);
   };
 
   const locked = lockLeft > 0;
@@ -85,7 +155,10 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               type="text"
               placeholder="kullanıcı"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                applyGuard(e.target.value);
+              }}
               autoFocus
               disabled={locked}
             />
