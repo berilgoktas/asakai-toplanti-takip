@@ -59,7 +59,7 @@ const formatTimeOnly = (date: Date) =>
     timeZone: "Europe/Istanbul",
   }).format(date);
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3004";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3004";
 
 const formatDateForApi = (date: Date) => {
   const y = date.getFullYear();

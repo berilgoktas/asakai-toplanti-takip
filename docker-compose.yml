@@ -1,0 +1,12 @@
+services:
+  asakai:
+    build: .
+    container_name: asakai-toplanti
+    ports:
+      - "3004:3004"
+      - "3005:3005"
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:3004
+      ASPNETCORE_ENVIRONMENT: Production
