@@ -1,0 +1,768 @@
+/* Global styles */
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #34495e;
+  --accent-color: #3498db;
+  --warning-color: #f39c12;
+  --danger-color: #c0392b;
+  --success-color: #27ae60;
+  --background-color: #ecf0f1;
+  --card-background: #ffffff;
+  --text-color: #2c3e50;
+  --text-light: #7f8c8d;
+  --border-color: #bdc3c7;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+  max-width: 100%;
+  box-sizing: border-box;
+  color: var(--text-color);
+}
+
+.meeting-tracker {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 10px 0;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin: 15px 0;
+  color: var(--secondary-color);
+}
+
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  min-width: 100px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px var(--shadow-color);
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 14px;
+  min-width: 80px;
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+}
+
+.btn-warning {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.btn-warning:hover {
+  background-color: #e67e22;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #a93226;
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #219a52;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #2c3e50;
+}
+
+.participant-card {
+  background: var(--card-background);
+  padding: 15px;
+  margin: 12px 0;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px var(--shadow-color);
+}
+
+.timer {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 10px 0;
+  color: var(--primary-color);
+}
+
+.note-section {
+  margin-top: 15px;
+}
+
+.note-input {
+  width: 100%;
+  padding: 12px;
+  margin: 5px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.history-toggle {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.history-card {
+  background: var(--card-background);
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px var(--shadow-color);
+}
+
+.history-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.history-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.history-participants {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.history-participant {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.history-participant h4 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+}
+
+.status-checkboxes {
+  margin: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.note-item {
+  display: flex;
+  gap: 8px;
+  margin: 5px 0;
+  flex-wrap: wrap;
+}
+
+.status-text {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.status-text p {
+  margin: 4px 0;
+  color: #666;
+}
+
+.time-input-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.time-unit-input {
+  width: 60px;
+  padding: 4px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.time-edit label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 14px;
+}
+
+.timer-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.button-group .btn {
+  flex: 0 1 auto;
+  min-width: 150px;
+  padding: 12px 24px;
+  font-size: 16px;
+  margin: 0;
+}
+
+.meeting-controls {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.meeting-controls .timer {
+  margin-bottom: 15px;
+}
+
+.meeting-controls .btn {
+  margin: 5px;
+}
+
+.status-radio {
+  display: flex;
+  gap: 15px;
+  margin: 10px 0;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.radio-label input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Temel mobil stil ayarları */
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+    font-size: 20px; /* veya 20px */
+  }
+
+  .btn {
+    padding: 14px 20px;
+    font-size: 16px;
+    margin: 4px;
+    width: auto;
+    min-width: unset;
+    flex: 1;
+  }
+
+  .btn-sm {
+    padding: 16px 22px; /* veya daha büyük */
+    font-size: 20px;   /* veya daha büyük */
+  }
+
+  .participant-card {
+    padding: 25px;
+  }
+
+  .timer {
+    font-size: 1.6em;
+  }
+
+  .note-input {
+    padding: 18px; /* veya daha büyük */
+    font-size: 20px;   /* veya daha büyük */
+  }
+
+  .checkbox-label {
+    font-size: 14px;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+  }
+
+  .time-unit-input {
+    width: 120px; /* veya daha büyük */
+    padding: 16px; /* veya daha büyük */
+    font-size: 20px;   /* veya daha büyük */
+  }
+
+  .button-group {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    flex-wrap: nowrap;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .button-group .btn {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 16px;
+    font-size: 14px;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .history-participants {
+    grid-template-columns: 1fr;
+  }
+
+  .time-input-group {
+    justify-content: space-between;
+    padding: 12px;
+  }
+
+  .time-input-group label {
+    font-size: 20px;   /* veya daha büyük */
+  }
+
+  h1 {
+    font-size: 2.2rem;
+    margin: 20px 0;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  .note-item {
+    flex-direction: column;
+  }
+
+  .note-item .btn {
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  .status-checkboxes {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .meeting-controls .btn {
+    font-size: 18px;
+    padding: 16px 24px;
+  }
+
+  .status-radio {
+    margin: 12px 0;
+    gap: 20px;
+    flex-direction: column;
+  }
+
+  .radio-label {
+    font-size: 18px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    justify-content: center;
+  }
+
+  .radio-label input[type="radio"] {
+    width: 28px;
+    height: 28px;
+    margin-right: 12px;
+  }
+
+  .status-text {
+    font-size: 18px;
+    margin: 12px 0;
+  }
+
+  .status-text p {
+    margin: 8px 0;
+    font-size: 18px;
+  }
+
+  .participant-card .btn {
+    width: auto;
+    margin: 4px;
+    flex: 1;
+  }
+
+  .control-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .control-buttons .btn {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    font-size: 14px;
+    padding: 12px 16px;
+  }
+}
+
+/* Orta boy mobil cihazlar için */
+@media (max-width: 576px) {
+  .button-group {
+    gap: 6px;
+  }
+
+  .button-group .btn {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .control-buttons {
+    gap: 6px;
+  }
+
+  .control-buttons .btn {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+/* Küçük mobil cihazlar için */
+@media (max-width: 375px) {
+  .button-group {
+    gap: 4px;
+  }
+
+  .button-group .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .control-buttons {
+    gap: 4px;
+  }
+
+  .control-buttons .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+/* En küçük mobil cihazlar için */
+@media (max-width: 320px) {
+  .button-group {
+    gap: 3px;
+  }
+
+  .button-group .btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .control-buttons {
+    gap: 3px;
+  }
+
+  .control-buttons .btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
+
+/* Modal Styles */
+.custom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  z-index: 1001;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-content h3 {
+  margin: 0 0 15px 0;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+.modal-content p {
+  margin: 0 0 20px 0;
+  color: var(--text-color);
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-actions .btn {
+  min-width: 100px;
+  font-size: 1rem;
+  padding: 12px 24px;
+}
+
+/* Mobile specific modal styles */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 85%;
+    padding: 20px;
+  }
+
+  .modal-content h3 {
+    font-size: 1.3rem;
+  }
+
+  .modal-content p {
+    font-size: 1rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+.control-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+  width: 100%;
+}
+
+.control-buttons .btn {
+  min-width: 150px;
+  padding: 12px 24px;
+  font-size: 16px;
+  flex: 0 1 auto;
+}
+
+@media (max-width: 768px) {
+  .note-section {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .note-input {
+    width: calc(100% - 24px);
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .control-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 15px;
+    width: calc(100% - 24px);
+  }
+
+  .control-buttons .btn {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    font-size: 14px;
+    padding: 12px 16px;
+  }
+
+  .note-section .btn {
+    width: calc(100% - 24px);
+    margin: 5px 0;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.meeting-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.end-meeting-section {
+  margin: 8px 0 4px;
+  padding: 14px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 1.2rem;
+  min-width: 200px;
+}
+
+.end-meeting-section .btn-large {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 16px 20px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #b91c1c 0%, #ef4444 100%);
+  color: #fff;
+  box-shadow: 0 12px 24px -14px rgba(185, 28, 28, 0.7);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+}
+
+.end-meeting-section .btn-large:hover:not(:disabled) {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px -14px rgba(185, 28, 28, 0.75);
+}
+
+.end-meeting-section .btn-large:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.end-meeting-section .btn-large:disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .end-meeting-section {
+    margin: 4px 0;
+    padding: 12px;
+  }
+
+  .btn-large {
+    width: auto;
+    padding: 16px 20px;
+    font-size: 16px;
+    flex: 1;
+  }
+
+  .end-meeting-section .btn-large {
+    width: 100%;
+    flex: none;
+    padding: 15px 16px;
+    font-size: 1rem;
+  }
+
+  .control-buttons {
+    flex-direction: row;
+  }
+
+  .control-buttons .btn {
+    width: auto;
+    flex: 1;
+  }
+}

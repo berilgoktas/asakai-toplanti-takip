@@ -1,0 +1,20 @@
+# Dependencies
+/node_modules
+
+# Build outputs
+/dist
+/.angular
+
+# IDE
+/.vscode
+/.idea
+
+# Environment
+/src/environments/*.ts
+!src/environments/environment.ts
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log
+*.tsbuildinfo

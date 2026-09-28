@@ -1,0 +1,6 @@
+@AsakaiToplantiApi_HostAddress = http://localhost:3004
+
+GET {{AsakaiToplantiApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
