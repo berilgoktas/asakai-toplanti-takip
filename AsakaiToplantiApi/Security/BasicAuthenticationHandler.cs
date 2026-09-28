@@ -73,9 +73,9 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         using var rd = cmd.ExecuteReader();
         if (!rd.Read())
         {
-            var lockFor = _lockout.RegisterFailure(kullaniciAdi);
-            if (lockFor != null)
-                Context.Items["loginLockRemaining"] = lockFor.Value;
+            var outcome = _lockout.RegisterFailure(kullaniciAdi);
+            if (outcome.LockDuration != null)
+                Context.Items["loginLockRemaining"] = outcome.LockDuration.Value;
             return Task.FromResult(AuthenticateResult.Fail("Kullanici adi veya sifre hatali."));
         }
 

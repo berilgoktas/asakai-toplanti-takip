@@ -68,22 +68,52 @@ public class ToplantilarController : ControllerBase
     public IActionResult List()
     {
         using var c = Open();
-        using var cmd = new NpgsqlCommand(@"
+        var map = new Dictionary<int, ToplantiDetayDto>();
+        var order = new List<int>();
+
+        using (var cmd = new NpgsqlCommand(@"
             SELECT ToplantiId, ToplantiTarihi, BaslangicSaati, BitisSaati, ToplamSureSn
             FROM dbo.Toplantilar
-            ORDER BY ToplantiTarihi DESC, ToplantiId DESC", c);
-        using var rd = cmd.ExecuteReader();
-        var list = new List<ToplantiOzetDto>();
-        while (rd.Read())
+            ORDER BY ToplantiTarihi DESC, ToplantiId DESC", c))
+        using (var rd = cmd.ExecuteReader())
         {
-            list.Add(new ToplantiOzetDto(
-                rd.GetInt32(0),
-                ReadDate(rd, 1),
-                ReadTime(rd, 2),
-                ReadTime(rd, 3),
-                rd.GetInt32(4)));
+            while (rd.Read())
+            {
+                var id = rd.GetInt32(0);
+                order.Add(id);
+                map[id] = new ToplantiDetayDto(
+                    id,
+                    ReadDate(rd, 1),
+                    ReadTime(rd, 2),
+                    ReadTime(rd, 3),
+                    rd.GetInt32(4),
+                    new List<KatilimciDto>());
+            }
         }
-        return Ok(list);
+
+        using (var cmd2 = new NpgsqlCommand(@"
+            SELECT k.ToplantiId, k.DepartmanId, d.DepartmanAdi, k.KonusmaSuresiSn, k.GecGeldi, k.Katilmadi, k.Notlar
+            FROM dbo.ToplantiKatilimcilari k
+            INNER JOIN dbo.Departmanlar d ON d.DepartmanId = k.DepartmanId
+            ORDER BY d.Sira", c))
+        using (var rd2 = cmd2.ExecuteReader())
+        {
+            while (rd2.Read())
+            {
+                var toplantiId = rd2.GetInt32(0);
+                if (!map.TryGetValue(toplantiId, out var detay))
+                    continue;
+                detay.Katilimcilar.Add(new KatilimciDto(
+                    rd2.GetInt32(1),
+                    rd2.GetString(2),
+                    rd2.GetInt32(3),
+                    rd2.GetBoolean(4),
+                    rd2.GetBoolean(5),
+                    NotlariParcala(rd2.IsDBNull(6) ? null : rd2.GetString(6))));
+            }
+        }
+
+        return Ok(order.Select(id => map[id]).ToList());
     }
 
     [HttpGet("{id:int}")]

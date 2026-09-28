@@ -154,21 +154,28 @@ export default function App() {
   const loadMeetingsFromApi = async () => {
     const listResponse = await apiRequest("/api/toplantilar");
     if (!listResponse.ok) throw new Error("Toplantı listesi alınamadı");
-    const meetings: Array<{ toplantiId: number }> = await listResponse.json();
-    const details = await Promise.all(
-      meetings.map(async (m) => {
-        const detailResponse = await apiRequest(`/api/toplantilar/${m.toplantiId}`);
-        if (!detailResponse.ok) throw new Error("Toplantı detayı alınamadı");
-        return detailResponse.json();
-      })
-    );
-    const mapped: MeetingHistory[] = details.map((m) => ({
+    const meetings: Array<{
+      toplantiId: number;
+      toplantiTarihi: string;
+      baslangicSaati: string;
+      bitisSaati: string;
+      toplamSureSn: number;
+      katilimcilar?: Array<{
+        departmanId: number;
+        departmanAdi: string;
+        konusmaSuresiSn: number;
+        gecGeldi: boolean;
+        katilmadi: boolean;
+        notlar: string[];
+      }>;
+    }> = await listResponse.json();
+    const mapped: MeetingHistory[] = meetings.map((m) => ({
       id: String(m.toplantiId),
       date: formatDateOnly(new Date(m.toplantiTarihi)),
       startTime: m.baslangicSaati,
       endTime: m.bitisSaati,
       totalTime: m.toplamSureSn,
-      participants: (m.katilimcilar ?? []).map((k: any) => ({
+      participants: (m.katilimcilar ?? []).map((k) => ({
         id: k.departmanId,
         name: k.departmanAdi,
         time: k.konusmaSuresiSn,
@@ -241,13 +248,15 @@ export default function App() {
       });
       if (!response.ok) {
         let message = "Kullanıcı adı veya şifre hatalı";
+        let lockSeconds = 0;
         try {
           const data = await response.json();
           if (data?.message) message = data.message;
+          if (typeof data?.kilitSaniye === "number") lockSeconds = data.kilitSaniye;
         } catch {
           /* ignore */
         }
-        return { ok: false, message };
+        return { ok: false, message, lockSeconds };
       }
       const basicToken = btoa(`${username}:${password}`);
       const header = `Basic ${basicToken}`;

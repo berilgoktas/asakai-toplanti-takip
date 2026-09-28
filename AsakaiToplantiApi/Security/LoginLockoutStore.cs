@@ -16,6 +16,8 @@ public sealed class LoginLockoutStore
         public DateTimeOffset LockUntil;
     }
 
+    public readonly record struct FailureResult(int Failures, int RemainingAttempts, TimeSpan? LockDuration);
+
     public bool IsLocked(string kullaniciAdi, out TimeSpan remaining)
     {
         remaining = TimeSpan.Zero;
@@ -34,18 +36,19 @@ public sealed class LoginLockoutStore
         }
     }
 
-    public TimeSpan? RegisterFailure(string kullaniciAdi)
+    public FailureResult RegisterFailure(string kullaniciAdi)
     {
         var key = Normalize(kullaniciAdi);
         if (key.Length == 0)
-            return null;
+            return new FailureResult(0, MaxFailuresBeforeLock, null);
 
         var entry = _entries.GetOrAdd(key, _ => new Entry());
         lock (entry)
         {
             entry.Failures++;
+            var remainingAttempts = Math.Max(0, MaxFailuresBeforeLock - entry.Failures);
             if (entry.Failures < MaxFailuresBeforeLock)
-                return null;
+                return new FailureResult(entry.Failures, remainingAttempts, null);
 
             var exponent = entry.Failures - MaxFailuresBeforeLock;
             var minutes = Math.Min(Math.Pow(2, exponent), MaxLock.TotalMinutes);
@@ -54,7 +57,7 @@ public sealed class LoginLockoutStore
                 duration = BaseLock;
 
             entry.LockUntil = DateTimeOffset.UtcNow + duration;
-            return duration;
+            return new FailureResult(entry.Failures, 0, duration);
         }
     }
 

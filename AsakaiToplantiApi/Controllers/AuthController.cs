@@ -44,10 +44,14 @@ public class AuthController : ControllerBase
             using var rd = cmd.ExecuteReader();
             if (!rd.Read())
             {
-                var lockFor = _lockout.RegisterFailure(body.KullaniciAdi);
-                if (lockFor != null)
-                    return TooMany(lockFor.Value);
-                return Unauthorized(new { message = "Kullanici adi veya sifre hatali." });
+                var outcome = _lockout.RegisterFailure(body.KullaniciAdi);
+                if (outcome.LockDuration != null)
+                    return TooMany(outcome.LockDuration.Value);
+                return Unauthorized(new
+                {
+                    message = LockoutText.AttemptsMessage(outcome.RemainingAttempts),
+                    kalanHak = outcome.RemainingAttempts
+                });
             }
 
             kullaniciId = rd.GetInt32(0);
@@ -69,6 +73,11 @@ public class AuthController : ControllerBase
     {
         var seconds = Math.Max(1, (int)Math.Ceiling(remaining.TotalSeconds));
         Response.Headers.RetryAfter = seconds.ToString();
-        return StatusCode(StatusCodes.Status429TooManyRequests, new { message = LockoutText.WaitMessage(remaining) });
+        return StatusCode(StatusCodes.Status429TooManyRequests, new
+        {
+            message = LockoutText.WaitMessage(remaining),
+            kalanHak = 0,
+            kilitSaniye = seconds
+        });
     }
 }
