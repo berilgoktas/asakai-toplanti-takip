@@ -2,6 +2,8 @@
 
 Günlük Asakai (sabah) toplantılarını dijital olarak yönetmek için yazılmış bir uygulamadır. Departman bazında konuşma sürelerini ölçer, katılım durumunu (geç kaldı / katılmadı) ve notları kaydeder, geçmiş toplantıları listeler ve Excel raporu üretir.
 
+Arayüz **mobil kullanım için** tasarlanmıştır: toplantı genellikle tablette veya telefonda, ayakta / pano başında yürütülür. Native iOS veya Android mağaza uygulaması değildir; tarayıcıda açılan, PWA olarak ana ekrana eklenebilen bir web uygulamasıdır. Masaüstünde de çalışır, asıl hedef küçük ekran ve dokunmatik kullanımdır.
+
 ## Ne işe yarar?
 
 Fabrika / ofis Asakai toplantısında her departman sırayla konuşur. Bu uygulama:
@@ -25,6 +27,21 @@ Giriş yapmadan kullanılmaz. Kimlik doğrulama Basic Auth ile yapılır.
 | Raporlar | Ay bazında süre, katılım, geç kalma ve not özetleri |
 
 Excel dışa aktarma, seçilen tarih aralığındaki toplantı ve katılımcı detaylarını iki sayfalık bir dosyada üretir.
+
+## Mobil ve PWA
+
+Proje native mobil uygulama olarak yazılmamıştır. Hedef, telefon veya tablette tarayıcıdan (veya ana ekran ikonundan) toplantıyı yönetmektir.
+
+Bunun için **PWA (Progressive Web App)** kullanılmıştır:
+
+- `vite-plugin-pwa` ile Web App Manifest ve service worker üretilir
+- Uygulama adı: Toplanti Takip (`standalone` görünüm)
+- `main.tsx` içinde service worker `registerSW({ immediate: true })` ile kaydedilir; güncellemeler otomatik alınır
+- Viewport `viewport-fit=cover` ve standalone modda safe-area boşlukları (çentik / home indicator) ayarlanır
+- Manifest `orientation: portrait-primary` — dikey kullanım önceliklidir
+- Telefon/tablette “Ana ekrana ekle” / “Install app” ile tarayıcı çubuğu olmadan uygulama gibi açılır
+
+PWA, statik arayüz dosyalarını önbelleğe alır. Canlı toplantı kaydı, giriş ve raporlar API + veritabanı istediği için **çevrimdışı tam çalışmaz**. Mağaza (App Store / Play Store) paketi yoktur; HTTPS üzerinden (örneğin Cloudflare) yayınlanınca kurulum önerisi görünür.
 
 ## Mimari
 
