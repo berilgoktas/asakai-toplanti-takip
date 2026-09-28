@@ -25,8 +25,9 @@ COPY --from=api-build /app/publish /app/api
 COPY --from=frontend-build /front/dist /usr/share/nginx/html
 COPY docker/nginx.conf /etc/nginx/sites-available/asakai.conf
 COPY docker/start.sh /start.sh
-RUN ln -s /etc/nginx/sites-available/asakai.conf /etc/nginx/sites-enabled/asakai.conf \
-    && chmod +x /start.sh
+RUN sed -i 's/\r$//' /start.sh /etc/nginx/sites-available/asakai.conf \
+    && chmod +x /start.sh \
+    && ln -s /etc/nginx/sites-available/asakai.conf /etc/nginx/sites-enabled/asakai.conf
 
 ENV ASPNETCORE_URLS=http://127.0.0.1:3004
 ENV ASPNETCORE_ENVIRONMENT=Production
@@ -34,4 +35,4 @@ EXPOSE 3004
 EXPOSE 3005
 
 WORKDIR /app/api
-ENTRYPOINT ["/start.sh"]
+ENTRYPOINT ["/bin/sh", "/start.sh"]
